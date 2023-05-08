@@ -3,6 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import FormScreen from '../screens/formscreen';
 import DataDetail from '../screens/DataDeatil';
+import EditList from '../screens/EditList';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,11 @@ function AppNavigation() {
           options={{headerShown: false}}
           name="DataDetail"
           component={DataDetail}
+        />
+        <Stack.Screen
+          options={{headerShown: false}}
+          name="EditList"
+          component={EditList}
         />
       </Stack.Navigator>
     </NavigationContainer>

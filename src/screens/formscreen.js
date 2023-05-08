@@ -13,56 +13,63 @@ const FormScreen = () => {
   const [formSubmissions, setFormSubmissions] = useState([]);
   const navigation = useNavigation();
 
+  console.log(formSubmissions)
+
   const clearForm = () => {
     setName('');
     setPhone('');
+
     
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
     const newSubmitForm = {
       name: name,
       phone: phone,
       latitude: latitude,
       longitude: longitude,
+      customid: Math.random().toString(),
     };
-    setFormSubmissions([...formSubmissions, newSubmitForm]);
-    clearForm();
+
     try {
-      AsyncStorage.setItem(
-        'form_submissions',
-        JSON.stringify(formSubmissions)
-      );
-      console.log('Form data saved successfully');
-      navigation.navigate('DataDetail');
+    const savedData = [...formSubmissions, newSubmitForm];
+    await AsyncStorage.setItem('form_submissions', JSON.stringify(savedData));
+    console.log('Form data saved successfully');
+    setFormSubmissions(savedData);
+    clearForm();
+    navigation.navigate('DataDetail');
+  } catch (e) {
+    console.log('Error saving form data: ', e);
+  }
+};
+
+useEffect(() => {
+  Geolocation.getCurrentPosition(
+    (position) => {
+      setLatitude(position.coords.latitude);
+      setLongitude(position.coords.longitude);
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  
+   
+  const fetchData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('form_submissions');
+      console.log('Retrieved form data:', jsonValue);
+      setFormSubmissions(jsonValue != null ? JSON.parse(jsonValue) : []);
     } catch (e) {
-      console.log('Error saving form data: ', e);
+      console.log('Error retrieving form submissions: ', e);
     }
   };
+  fetchData();
+}, []);
 
-  useEffect(() => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        setLatitude(position.coords.latitude),
-        setLongitude(position.coords.longitude);
-      },
-      (error) => {
-        console.log(error);
-      }
-    ),[];
   
-    const fetchData = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('form_submissions');
-        console.log('Retrieved form data:', jsonValue);
-        setFormSubmissions(jsonValue != null ? JSON.parse(jsonValue) : []);
-      } catch (e) {
-        console.log('Error retrieving form submissions: ', e);
-      }
-    };
-    fetchData();
-  }, []);
-  
+
+ 
 
   return (
     <View>
